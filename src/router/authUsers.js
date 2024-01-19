@@ -3,6 +3,7 @@ import {
   authenticateJWT,
   getAllUsers,
   getUserByUsername,
+  getUserByWebsite,
   deleteUser,
 } from '../services/users.js';
 
@@ -39,7 +40,7 @@ auth_users.get('/auth/discounts', authenticateJWT, async (req, res) => {
 
 // Get Discount by Country
 auth_users.get(
-  '/auth/discounts/:country',
+  '/auth/discounts/country/:country',
   authenticateJWT,
   async (req, res) => {
     const country = req.params.country;
@@ -54,7 +55,7 @@ auth_users.get(
 
 // Get Discounts by Website
 auth_users.get(
-  '/auth/discounts/:website',
+  '/auth/discounts/website/:website',
   authenticateJWT,
   async (req, res) => {
     const website = req.params.website;
@@ -69,7 +70,7 @@ auth_users.get(
 
 // Delete a Discount
 auth_users.delete(
-  '/auth/discounts/:country',
+  '/auth/discounts/country/:country',
   authenticateJWT,
   async (req, res) => {
     const country = req.params.country;
@@ -84,7 +85,22 @@ auth_users.delete(
   }
 );
 
-// Remove a User
+// Get User by Website
+auth_users.get(
+  '/auth/user/website/:website',
+  authenticateJWT,
+  async (req, res) => {
+    const website = req.params.website;
+    const result = await getUserByWebsite(website);
+    if (!result || result.length == 0) {
+      res.status(404).json({ error: 'Not found' });
+    } else {
+      res.status(200).json(result);
+    }
+  }
+);
+
+// Remove User
 auth_users.delete('/auth/user/:username', authenticateJWT, async (req, res) => {
   const username = req.params.username;
   const result = await deleteUser(username);
@@ -98,13 +114,13 @@ auth_users.delete('/auth/user/:username', authenticateJWT, async (req, res) => {
 // ------------------ For Tests -----------------------
 
 // Get all Users
-auth_users.get('/auth/users', async (req, res) => {
+auth_users.get('/auth/users', authenticateJWT, async (req, res) => {
   const results = await getAllUsers();
   return res.status(200).json(results);
 });
 
 // Get User by Username
-auth_users.get('/auth/user/:username', async (req, res) => {
+auth_users.get('/auth/user/:username', authenticateJWT, async (req, res) => {
   const username = req.params.username;
   const result = await getUserByUsername(username);
   if (!result) {

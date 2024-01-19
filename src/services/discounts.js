@@ -23,7 +23,6 @@ export const addDiscount = async (discount) => {
   });
 
   const response = await docClient.send(command);
-  console.log(response);
   return true;
 };
 
@@ -49,7 +48,6 @@ export const getDiscountByCountry = async (country) => {
   });
 
   const response = await docClient.send(command);
-  console.log(response.data);
   return response.Item;
 };
 
@@ -57,14 +55,13 @@ export const getDiscountByCountry = async (country) => {
 export const getDiscountsByWebsite = async (website) => {
   const command = new QueryCommand({
     IndexName: 'WebsiteIndex',
-    TableName: 'Discounts',
+    TableName: discounts,
     KeyConditionExpression: 'Website = :website',
     ExpressionAttributeValues: {
       ':website': website,
     },
     ConsistentRead: false,
   });
-
   const response = await docClient.send(command);
   return response.Items;
 };

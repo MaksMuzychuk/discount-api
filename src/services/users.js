@@ -5,6 +5,7 @@ import { docClient } from './dynamodb.js';
 const { verify } = pkg;
 
 import {
+  QueryCommand,
   PutCommand,
   ScanCommand,
   GetCommand,
@@ -54,7 +55,6 @@ export const getAllUsers = async () => {
   });
 
   const response = await docClient.send(command);
-  // console.log(response.Items);
   return response.Items;
 };
 
@@ -68,12 +68,6 @@ export const getUserByUsername = async (username) => {
   });
 
   const response = await docClient.send(command);
-  // console.log(response.Item);
-  // return {
-  //   username: response.Item.Username,
-  //   company: response.Item.Company,
-  //   website: response.Item.Website,
-  // };
   return response.Item;
 };
 
@@ -90,6 +84,21 @@ export const authenticatedUser = async (username, password) => {
   } else {
     return false;
   }
+};
+
+// Get User by Website
+export const getUserByWebsite = async (website) => {
+  const command = new QueryCommand({
+    IndexName: 'WebsiteIndex',
+    TableName: users,
+    KeyConditionExpression: 'Website = :website',
+    ExpressionAttributeValues: {
+      ':website': website,
+    },
+    ConsistentRead: false,
+  });
+  const response = await docClient.send(command);
+  return response.Items;
 };
 
 // Authenticate JWT
