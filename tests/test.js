@@ -67,7 +67,7 @@ test('[e2e] Get User by Username', async (t) => {
     `/auth/user/${t.context.user.username}`
   );
   t.is(response.status, 200);
-  const user = response.data.Item;
+  const user = response.data;
   t.like(user, t.context.user);
 });
 
