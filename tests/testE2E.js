@@ -1,6 +1,6 @@
 import test from 'ava';
 import axios from 'axios';
-import { generateRandomPassword } from '../src/services/utils.js';
+import { generateRandomPassword } from '../src/utils/generatePassword.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

@@ -1,7 +1,7 @@
-import MD5 from './MD5.js';
-import { accessTokenSecret } from './accessTokenSecret.js';
+import MD5 from '../utils/MD5.js';
+import { accessTokenSecret } from '../utils/accessTokenSecret.js';
 import pkg from 'jsonwebtoken';
-import { docClient } from './dynamodb.js';
+import { docClient } from '../utils/dynamodb.js';
 const { verify } = pkg;
 
 import {

@@ -1,4 +1,4 @@
-import { docClient } from './dynamodb.js';
+import { docClient } from '../utils/dynamodb.js';
 
 import {
   QueryCommand,

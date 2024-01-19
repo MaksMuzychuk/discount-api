@@ -6,7 +6,7 @@ import {
   authenticatedUser,
 } from '../services/users.js';
 import { createUser } from '../services/users.js';
-import { accessTokenSecret } from '../services/accessTokenSecret.js';
+import { accessTokenSecret } from '../utils/accessTokenSecret.js';
 
 const { sign } = pkg;
 

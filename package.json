@@ -7,7 +7,7 @@
   "scripts": {
     "test": "ava",
     "test:unit": "ava ./src",
-    "test:e2e": "ava ./tests",
+    "test:e2e": "ava ./tests/testE2E.js",
     "start": "nodemon --watch src src/index.js"
   },
   "author": "",
