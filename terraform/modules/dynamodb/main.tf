@@ -1,8 +1,6 @@
 resource "aws_dynamodb_table" "table-discounts" {
   name           = "Discounts"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 1
-  write_capacity = 1
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "Country"
 
   attribute {
@@ -18,8 +16,6 @@ resource "aws_dynamodb_table" "table-discounts" {
   global_secondary_index {
     name               = "WebsiteIndex"
     hash_key           = "Website"
-    write_capacity     = 1
-    read_capacity      = 1
     projection_type    = "INCLUDE"
     non_key_attributes = ["Country", "Code", "Message"]
   }
@@ -27,9 +23,7 @@ resource "aws_dynamodb_table" "table-discounts" {
 
 resource "aws_dynamodb_table" "table-users" {
   name           = "Users"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 1
-  write_capacity = 1
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "Username"
 
   attribute {
@@ -45,8 +39,6 @@ resource "aws_dynamodb_table" "table-users" {
   global_secondary_index {
     name               = "WebsiteIndex"
     hash_key           = "Website"
-    write_capacity     = 1
-    read_capacity      = 1
     projection_type    = "INCLUDE"
     non_key_attributes = ["Username", "Company"]
   }
