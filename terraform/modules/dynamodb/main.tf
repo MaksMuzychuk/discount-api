@@ -24,10 +24,10 @@ resource "aws_dynamodb_table" "table-discounts" {
 resource "aws_dynamodb_table" "table-users" {
   name           = "Users"
   billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "Username"
+  hash_key       = "Email"
 
   attribute {
-    name = "Username"
+    name = "Email"
     type = "S"
   }
 
@@ -40,6 +40,6 @@ resource "aws_dynamodb_table" "table-users" {
     name               = "WebsiteIndex"
     hash_key           = "Website"
     projection_type    = "INCLUDE"
-    non_key_attributes = ["Username", "Company"]
+    non_key_attributes = ["Email", "Company"]
   }
 }
