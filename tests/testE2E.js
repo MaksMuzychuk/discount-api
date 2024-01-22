@@ -13,7 +13,7 @@ test.before(async (t) => {
   });
 
   t.context.user = {
-    username: 'Maks' + Math.ceil(Math.random() * 100).toString(),
+    email: 'Maks' + Math.ceil(Math.random() * 100).toString() + '@gmail.com',
     password: generateRandomPassword(),
     company: 'Qwerty',
     website: 'qwerty.com',
@@ -61,7 +61,7 @@ test('[e2e] Get all Users', async (t) => {
   t.truthy(response.data.length > 0);
 });
 
-test('[e2e] Get User by Username', async (t) => {
+test('[e2e] Get User by Email', async (t) => {
   const config = {
     headers: {
       authorization: `Bearer ${t.context.accessToken}`,
@@ -69,12 +69,12 @@ test('[e2e] Get User by Username', async (t) => {
   };
 
   const response = await t.context.API.get(
-    `/auth/user/${t.context.user.username}`,
+    `/auth/user/${t.context.user.email}`,
     config
   );
   t.is(response.status, 200);
   const user = {
-    username: response.data.Username,
+    email: response.data.Email,
     password: t.context.user.password,
     company: response.data.Company,
     website: response.data.Website,
@@ -159,7 +159,7 @@ test.after.always(async (t) => {
   t.is(deleteDiscount.status, 200);
 
   const deleteUser = await t.context.API.delete(
-    `/auth/user/${t.context.user.username}`,
+    `/auth/user/${t.context.user.email}`,
     config
   );
   t.is(deleteUser.status, 200);

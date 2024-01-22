@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import pkg from 'jsonwebtoken';
 import {
-  isValidUsername,
+  isValidEmail,
   doesExist,
   authenticatedUser,
 } from '../services/users.js';
@@ -14,19 +14,19 @@ const public_users = Router();
 
 // Register new User
 public_users.post('/register', async (req, res) => {
-  const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
   const company = req.body.company;
   const website = req.body.website;
 
-  if (isValidUsername(username) && password) {
-    if (!(await doesExist(username))) {
-      createUser(username, password, company, website);
+  if (isValidEmail(email) && password) {
+    if (!(await doesExist(email))) {
+      createUser(email, password, company, website);
       return res
         .status(200)
-        .json({ message: `${username} successfully registred.` });
+        .json({ message: `${email} successfully registred.` });
     } else {
-      return res.status(404).json({ message: `${username} already exists.` });
+      return res.status(404).json({ message: `${email} already exists.` });
     }
   }
   return res.status(404).json({ message: 'Unable to register user.' });
@@ -34,19 +34,19 @@ public_users.post('/register', async (req, res) => {
 
 // Login public User
 public_users.post('/login', async (req, res) => {
-  const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(404).json({ message: 'Error loging in.' });
   }
 
-  if (await authenticatedUser(username, password)) {
+  if (await authenticatedUser(email, password)) {
     let accessToken = sign(
       {
         user: {
           id: 'unknown',
-          username: username,
+          email: email,
         },
       },
       accessTokenSecret,

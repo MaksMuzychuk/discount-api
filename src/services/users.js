@@ -14,14 +14,14 @@ import {
 
 const users = 'Users';
 
-// Validation Username
-export const isValidUsername = (username) => {
-  return username && typeof username === 'string' && username.length > 2;
+// Validation Email
+export const isValidEmail = (email) => {
+  return email && typeof email === 'string' && email.length > 2;
 };
 
 // Does Exist User
-export const doesExist = async (username) => {
-  const user = await getUserByUsername(username);
+export const doesExist = async (email) => {
+  const user = await getUserByEmail(email);
   if (user === undefined) {
     return false;
   } else {
@@ -30,12 +30,12 @@ export const doesExist = async (username) => {
 };
 
 // Create new User
-export const createUser = async (username, password, company, website) => {
+export const createUser = async (email, password, company, website) => {
   const passwordHash = MD5(password);
   const command = new PutCommand({
     TableName: users,
     Item: {
-      Username: username,
+      Email: email,
       Password: passwordHash,
       Company: company,
       Website: website,
@@ -50,7 +50,7 @@ export const createUser = async (username, password, company, website) => {
 export const getAllUsers = async () => {
   const command = new ScanCommand({
     ProjectionExpression: '#Name, Company, Website',
-    ExpressionAttributeNames: { '#Name': 'Username' },
+    ExpressionAttributeNames: { '#Name': 'Email' },
     TableName: users,
   });
 
@@ -58,12 +58,12 @@ export const getAllUsers = async () => {
   return response.Items;
 };
 
-// Get User by Username
-export const getUserByUsername = async (username) => {
+// Get User by Email
+export const getUserByEmail = async (email) => {
   const command = new GetCommand({
     TableName: users,
     Key: {
-      Username: username,
+      Email: email,
     },
   });
 
@@ -71,12 +71,12 @@ export const getUserByUsername = async (username) => {
   return response.Item;
 };
 
-// Get User by Username and Password
-export const authenticatedUser = async (username, password) => {
+// Get User by Email and Password
+export const authenticatedUser = async (email, password) => {
   const queryPassword = MD5(password);
-  const user = await getUserByUsername(username);
+  const user = await getUserByEmail(email);
   if (user) {
-    if (username == user.Username && queryPassword == user.Password) {
+    if (email == user.Email && queryPassword == user.Password) {
       return true;
     } else {
       return false;
@@ -121,9 +121,9 @@ export const authenticateJWT = (req, res, next) => {
   }
 };
 
-// Delete User  by Username
-export const deleteUser = async (username) => {
-  const user = await getUserByUsername(username);
+// Delete User  by Email
+export const deleteUser = async (email) => {
+  const user = await getUserByEmail(email);
 
   if (user === undefined) {
     return false;
@@ -131,7 +131,7 @@ export const deleteUser = async (username) => {
     const command = new DeleteCommand({
       TableName: users,
       Key: {
-        Username: username,
+        Email: email,
       },
     });
 

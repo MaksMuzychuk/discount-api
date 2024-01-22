@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   authenticateJWT,
   getAllUsers,
-  getUserByUsername,
+  getUserByEmail,
   getUserByWebsite,
   deleteUser,
 } from '../services/users.js';
@@ -101,9 +101,9 @@ auth_users.get(
 );
 
 // Remove User
-auth_users.delete('/auth/user/:username', authenticateJWT, async (req, res) => {
-  const username = req.params.username;
-  const result = await deleteUser(username);
+auth_users.delete('/auth/user/:email', authenticateJWT, async (req, res) => {
+  const email = req.params.email;
+  const result = await deleteUser(email);
   if (result) {
     res.status(200).json({ result: 'User has been removed.' });
   } else {
@@ -119,10 +119,10 @@ auth_users.get('/auth/users', authenticateJWT, async (req, res) => {
   return res.status(200).json(results);
 });
 
-// Get User by Username
-auth_users.get('/auth/user/:username', authenticateJWT, async (req, res) => {
-  const username = req.params.username;
-  const result = await getUserByUsername(username);
+// Get User by Email
+auth_users.get('/auth/user/:email', authenticateJWT, async (req, res) => {
+  const email = req.params.email;
+  const result = await getUserByEmail(email);
   if (!result) {
     res.status(404).json({ error: 'Not found' });
   } else {
