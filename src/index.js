@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import session from 'express-session';
 import { auth_routes } from './router/authUsers.js';
 import { public_routes } from './router/publicUsers.js';
+import { admin_routes } from './router/adminUsers.js';
 
 const app = express();
 
@@ -45,5 +46,6 @@ const PORT = 5000;
 
 app.use('/', auth_routes);
 app.use('/', public_routes);
+app.use('/', admin_routes);
 
 app.listen(PORT, () => console.log('Server is running'));

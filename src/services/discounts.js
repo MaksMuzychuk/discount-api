@@ -23,7 +23,7 @@ export const addDiscount = async (discount) => {
   });
 
   const response = await docClient.send(command);
-  return true;
+  return response;
 };
 
 // Get all Discounts

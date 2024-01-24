@@ -1,21 +1,31 @@
 import { Router } from 'express';
-import {
-  authenticateJWT,
-  getAllUsers,
-  getUserByEmail,
-  getUserByWebsite,
-  deleteUser,
-} from '../services/users.js';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
+  addDiscount,
   getAllDiscounts,
   getDiscountByCountry,
   getDiscountsByWebsite,
-  addDiscount,
   deleteDiscount,
 } from '../services/discounts.js';
+import { authenticateJWT } from '../utils/userUtils.js';
+import { addWebsite } from '../services/websites.js';
 
 const auth_users = Router();
+
+// Add Website
+auth_users.post('/auth/website/add', authenticateJWT, async (req, res) => {
+  const websiteId = uuidv4();
+  const userId = req.user.user.userId;
+  const website = req.body.website;
+
+  const result = await addWebsite({ websiteId, userId, website });
+  if (result) {
+    return res.status(200).json({ message: `A website successfully added.` });
+  } else {
+    return res.status(400).json({ message: 'Unable to add a website.' });
+  }
+});
 
 // Add new Discount
 auth_users.post('/auth/discounts/new', authenticateJWT, async (req, res) => {
@@ -84,50 +94,5 @@ auth_users.delete(
     }
   }
 );
-
-// Get User by Website
-auth_users.get(
-  '/auth/user/website/:website',
-  authenticateJWT,
-  async (req, res) => {
-    const website = req.params.website;
-    const result = await getUserByWebsite(website);
-    if (!result || result.length == 0) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
-  }
-);
-
-// Remove User
-auth_users.delete('/auth/user/:email', authenticateJWT, async (req, res) => {
-  const email = req.params.email;
-  const result = await deleteUser(email);
-  if (result) {
-    res.status(200).json({ result: 'User has been removed.' });
-  } else {
-    res.status(404).json({ error: 'User does not exist.' });
-  }
-});
-
-// ------------------ For Tests -----------------------
-
-// Get all Users
-auth_users.get('/auth/users', authenticateJWT, async (req, res) => {
-  const results = await getAllUsers();
-  return res.status(200).json(results);
-});
-
-// Get User by Email
-auth_users.get('/auth/user/:email', authenticateJWT, async (req, res) => {
-  const email = req.params.email;
-  const result = await getUserByEmail(email);
-  if (!result) {
-    res.status(404).json({ error: 'Not found' });
-  } else {
-    res.status(200).json(result);
-  }
-});
 
 export const auth_routes = auth_users;

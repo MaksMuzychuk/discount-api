@@ -1,8 +1,5 @@
 import MD5 from '../utils/MD5.js';
-import { accessTokenSecret } from '../utils/accessTokenSecret.js';
-import pkg from 'jsonwebtoken';
 import { docClient } from '../utils/dynamodb.js';
-const { verify } = pkg;
 
 import {
   QueryCommand,
@@ -11,72 +8,43 @@ import {
   GetCommand,
   DeleteCommand,
 } from '@aws-sdk/lib-dynamodb';
+import { addWebsite } from './websites.js';
 
 const users = 'Users';
 
-// Validation Email
-export const isValidEmail = (email) => {
-  return email && typeof email === 'string' && email.length > 2;
-};
-
-// Does Exist User
-export const doesExist = async (email) => {
-  const user = await getUserByEmail(email);
-  if (user === undefined) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
-// Create new User
-export const createUser = async (email, password, company, website) => {
+// Add User
+export const addUser = async (
+  userId,
+  email,
+  password,
+  company,
+  websiteId,
+  website
+) => {
   const passwordHash = MD5(password);
+
   const command = new PutCommand({
     TableName: users,
     Item: {
+      UserId: userId,
       Email: email,
       Password: passwordHash,
       Company: company,
-      Website: website,
-    },
-  });
-
-  await docClient.send(command);
-  return true;
-};
-
-// Get all Users
-export const getAllUsers = async () => {
-  const command = new ScanCommand({
-    ProjectionExpression: '#Name, Company, Website',
-    ExpressionAttributeNames: { '#Name': 'Email' },
-    TableName: users,
-  });
-
-  const response = await docClient.send(command);
-  return response.Items;
-};
-
-// Get User by Email
-export const getUserByEmail = async (email) => {
-  const command = new GetCommand({
-    TableName: users,
-    Key: {
-      Email: email,
     },
   });
 
   const response = await docClient.send(command);
-  return response.Item;
+
+  addWebsite({ websiteId, userId, website });
+  return response;
 };
 
-// Get User by Email and Password
+// Authentification User
 export const authenticatedUser = async (email, password) => {
   const queryPassword = MD5(password);
   const user = await getUserByEmail(email);
   if (user) {
-    if (email == user.Email && queryPassword == user.Password) {
+    if (email == user[0].Email && queryPassword == user[0].Password) {
       return true;
     } else {
       return false;
@@ -86,14 +54,39 @@ export const authenticatedUser = async (email, password) => {
   }
 };
 
-// Get User by Website
-export const getUserByWebsite = async (website) => {
-  const command = new QueryCommand({
-    IndexName: 'WebsiteIndex',
+// Get all Users
+export const getAllUsers = async () => {
+  const command = new ScanCommand({
+    ProjectionExpression: '#Name, Email, Company',
+    ExpressionAttributeNames: { '#Name': 'UserId' },
     TableName: users,
-    KeyConditionExpression: 'Website = :website',
+  });
+
+  const response = await docClient.send(command);
+  return response.Items;
+};
+
+// Get User by UserId
+export const getUserByUserId = async (userId) => {
+  const command = new GetCommand({
+    TableName: users,
+    Key: {
+      UserId: userId,
+    },
+  });
+
+  const response = await docClient.send(command);
+  return response.Item;
+};
+
+// Get User by Email
+export const getUserByEmail = async (email) => {
+  const command = new QueryCommand({
+    IndexName: 'Email-Index',
+    TableName: users,
+    KeyConditionExpression: 'Email = :email',
     ExpressionAttributeValues: {
-      ':website': website,
+      ':email': email,
     },
     ConsistentRead: false,
   });
@@ -101,37 +94,17 @@ export const getUserByWebsite = async (website) => {
   return response.Items;
 };
 
-// Authenticate JWT
-export const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
-    verify(token, accessTokenSecret, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-
-      req.user = user;
-      next();
-    });
-  } else {
-    res.sendStatus(401);
-  }
-};
-
-// Delete User  by Email
-export const deleteUser = async (email) => {
-  const user = await getUserByEmail(email);
-
+// Delete User by UserId
+export const deleteUser = async (userId) => {
+  const user = await getUserByUserId(userId);
+  // console.log(user);
   if (user === undefined) {
     return false;
   } else {
     const command = new DeleteCommand({
       TableName: users,
       Key: {
-        Email: email,
+        UserId: userId,
       },
     });
 
