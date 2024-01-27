@@ -1,10 +1,13 @@
 import test from 'ava';
 import axios from 'axios';
-import { generateRandomPassword } from './utils/generatePassword.js';
 import dotenv from 'dotenv';
+import { generateRandomPassword } from './utils/generatePassword.js';
+
 dotenv.config();
 
 const API_BASE_URL = `http://${process.env.SERVER_IP}:5000/`;
+
+// -------------------------------   Tests Before   ----------------------------------
 
 test.before(async (t) => {
   t.context.API = axios.create({
@@ -13,154 +16,193 @@ test.before(async (t) => {
   });
 
   t.context.user = {
-    email: 'Maks' + Math.ceil(Math.random() * 100).toString() + '@gmail.com',
+    email: 'maks' + Math.ceil(Math.random() * 100).toString() + '@gmail.com',
     password: generateRandomPassword(),
     company: 'Qwerty',
     website: 'qwerty.com',
   };
 
-  t.context.discount = {
-    country: 'Japan' + +Math.ceil(Math.random() * 100).toString(),
-    code: `testprefix-${Math.ceil(Math.random() * 10000).toString()}`,
-    message: 'Random text',
-    website: 'Anyone',
+  const registerUser = await t.context.API.post(`/register`, t.context.user);
+  t.is(registerUser.status, 200);
+
+  const loginUser = await t.context.API.post('/login', t.context.user);
+  t.is(loginUser.status, 200);
+
+  t.context.accessToken = {
+    headers: {
+      authorization: `Bearer ${loginUser.data.accessToken}`,
+    },
   };
 
-  const responseRegister = await t.context.API.post(
-    `/register`,
-    t.context.user
+  const getUserId = await t.context.API.get(
+    `/admin/user/email/${t.context.user.email}`,
+    t.context.accessToken
   );
-  t.is(responseRegister.status, 200);
-  const responseLogin = await t.context.API.post('/login', t.context.user);
-  t.is(responseLogin.status, 200);
-  t.context.accessToken = responseLogin.data.accessToken;
+  t.context.userId = getUserId.data[0].UserId;
 
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
+  t.context.website = {
+    website: 'qwerty.com',
+  };
+
+  const getWebsiteId = await t.context.API.get(
+    `/auth/websites/website/${t.context.user.website}`,
+    t.context.accessToken
+  );
+  t.context.websiteId = getWebsiteId.data[0].WebsiteId;
+
+  t.context.discount = {
+    country: 'India' + +Math.ceil(Math.random() * 100).toString(),
+    code: `testprefix-${Math.ceil(Math.random() * 10000).toString()}`,
+    text: 'Random text',
   };
 
   const responseAddDiscount = await t.context.API.post(
-    '/auth/discounts/new',
+    '/auth/discounts/add',
     t.context.discount,
-    config
+    t.context.accessToken
   );
   t.is(responseAddDiscount.status, 200);
+
+  const getDiscountId = await t.context.API.get(
+    `/auth/discounts/country/${t.context.discount.country}`,
+    t.context.accessToken
+  );
+  t.context.discountId = getDiscountId.data[0].DiscountId;
 });
 
-test('[e2e] Get all Users', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
+// -------------------------------   Tests Users   ----------------------------------
 
-  const response = await t.context.API.get(`/auth/users`, config);
+test('[e2e] Get all Users', async (t) => {
+  const response = await t.context.API.get(
+    `/admin/users`,
+    t.context.accessToken
+  );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
 });
 
-test('[e2e] Get User by Email', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
-
+test('[e2e] Get User by UserId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/user/${t.context.user.email}`,
-    config
+    `/admin/user/${t.context.userId}`,
+    t.context.accessToken
   );
   t.is(response.status, 200);
+
   const user = {
+    userId: response.data.UserId,
     email: response.data.Email,
     password: t.context.user.password,
     company: response.data.Company,
-    website: response.data.Website,
+    website: t.context.user.website,
   };
   t.like(user, t.context.user);
 });
 
-test('[e2e] Get Users by Website', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
-
+test('[e2e] Get User by Email', async (t) => {
   const response = await t.context.API.get(
-    `/auth/user/website/${t.context.user.website}`,
-    config
+    `/admin/user/email/${t.context.user.email}`,
+    t.context.accessToken
   );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
 });
 
-test('[e2e] Get all Discounts', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
+// -------------------------------   Tests Websites   ----------------------------------
 
-  const response = await t.context.API.get(`/auth/discounts`, config);
+test('[e2e] Get all Websites by UserId', async (t) => {
+  const response = await t.context.API.get(
+    `/auth/websites`,
+    t.context.accessToken
+  );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
 });
 
-test('[e2e] Get Discount by Country', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
-
+test('[e2e] Get Website by WebsiteId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/discounts/country/${t.context.discount.country}`,
-    config
+    `/auth/websites/websiteId/${t.context.websiteId}`,
+    t.context.accessToken
   );
   t.is(response.status, 200);
+
+  const website = {
+    website: response.data.Website,
+  };
+  t.like(website, t.context.website);
+});
+
+test('[e2e] Get Website by Website', async (t) => {
+  const response = await t.context.API.get(
+    `/auth/websites/website/${t.context.website.website}`,
+    t.context.accessToken
+  );
+  t.is(response.status, 200);
+
+  const website = {
+    website: response.data[0].Website,
+  };
+  t.like(website, t.context.website);
+});
+
+// -------------------------------   Tests Discounts   ----------------------------------
+
+test('[e2e] Get all Discounts by WebsiteId', async (t) => {
+  const response = await t.context.API.get(
+    `/auth/discounts/websiteId/${t.context.websiteId}`,
+    t.context.accessToken
+  );
+  t.is(response.status, 200);
+  t.truthy(response.data.length > 0);
+});
+
+test('[e2e] Get Discount by DiscountId', async (t) => {
+  const response = await t.context.API.get(
+    `/auth/discounts/discountId/${t.context.discountId}`,
+    t.context.accessToken
+  );
+  t.is(response.status, 200);
+
   const discount = {
     country: response.data.Country,
     code: response.data.Code,
-    message: response.data.Message,
-    website: response.data.Website,
+    text: response.data.Text,
   };
   t.like(discount, t.context.discount);
 });
 
-test('[e2e] Get Discounts by Website', async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
-
+test('[e2e] Get Discount by Country', async (t) => {
   const response = await t.context.API.get(
-    `/auth/discounts/website/${t.context.discount.website}`,
-    config
+    `/auth/discounts/country/${t.context.discount.country}`,
+    t.context.accessToken
   );
   t.is(response.status, 200);
-  t.truthy(response.data.length > 0);
+
+  const discount = {
+    country: response.data[0].Country,
+    code: response.data[0].Code,
+    text: response.data[0].Text,
+  };
+  t.like(discount, t.context.discount);
 });
 
-test.after.always(async (t) => {
-  const config = {
-    headers: {
-      authorization: `Bearer ${t.context.accessToken}`,
-    },
-  };
+// -------------------------------   Tests After   ----------------------------------
 
+test.after.always(async (t) => {
   const deleteDiscount = await t.context.API.delete(
-    `/auth/discounts/country/${t.context.discount.country}`,
-    config
+    `/auth/discounts/discountId/${t.context.discountId}`,
+    t.context.accessToken
   );
   t.is(deleteDiscount.status, 200);
 
+  const deleteWebsite = await t.context.API.delete(
+    `/auth/websites/websiteId/${t.context.websiteId}`,
+    t.context.accessToken
+  );
+  t.is(deleteWebsite.status, 200);
+
   const deleteUser = await t.context.API.delete(
-    `/auth/user/${t.context.user.email}`,
-    config
+    `/admin/user/${t.context.userId}`,
+    t.context.accessToken
   );
   t.is(deleteUser.status, 200);
 });

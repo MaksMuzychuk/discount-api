@@ -1,6 +1,3 @@
-import MD5 from '../utils/MD5.js';
-import { docClient } from '../utils/dynamodb.js';
-
 import {
   QueryCommand,
   PutCommand,
@@ -8,7 +5,10 @@ import {
   GetCommand,
   DeleteCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { addWebsite } from './websites.js';
+
+import MD5 from '../utils/MD5.js';
+import { docClient } from '../utils/dynamodb.js';
+import { addWebsite, deleteWebsitesByUserId } from './websites.js';
 
 const users = 'Users';
 
@@ -35,7 +35,7 @@ export const addUser = async (
 
   const response = await docClient.send(command);
 
-  addWebsite({ websiteId, userId, website });
+  await addWebsite({ websiteId, userId, website });
   return response;
 };
 
@@ -90,6 +90,7 @@ export const getUserByEmail = async (email) => {
     },
     ConsistentRead: false,
   });
+
   const response = await docClient.send(command);
   return response.Items;
 };
@@ -97,7 +98,6 @@ export const getUserByEmail = async (email) => {
 // Delete User by UserId
 export const deleteUser = async (userId) => {
   const user = await getUserByUserId(userId);
-  // console.log(user);
   if (user === undefined) {
     return false;
   } else {
@@ -109,6 +109,7 @@ export const deleteUser = async (userId) => {
     });
 
     const response = await docClient.send(command);
+    await deleteWebsitesByUserId(userId);
     return true;
   }
 };

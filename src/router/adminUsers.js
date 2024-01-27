@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
+import { authenticateJWT } from '../utils/userUtils.js';
 import {
   getAllUsers,
   getUserByUserId,
   getUserByEmail,
   deleteUser,
 } from '../services/users.js';
-import { authenticateJWT } from '../utils/userUtils.js';
 
 const admin_users = Router();
 

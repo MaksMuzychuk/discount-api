@@ -1,24 +1,25 @@
-import { docClient } from '../utils/dynamodb.js';
-
 import {
   QueryCommand,
   PutCommand,
-  ScanCommand,
   GetCommand,
   DeleteCommand,
 } from '@aws-sdk/lib-dynamodb';
 
+import { docClient } from '../utils/dynamodb.js';
+
 const discounts = 'Discounts';
 
-// Add new Discount
+// Add Discount
 export const addDiscount = async (discount) => {
   const command = new PutCommand({
     TableName: discounts,
     Item: {
+      DiscountId: discount.discountId,
+      WebsiteId: discount.websiteId,
+      UserId: discount.userId,
       Country: discount.country,
       Code: discount.code,
-      Message: discount.message,
-      Website: discount.website,
+      Text: discount.text,
     },
   });
 
@@ -26,24 +27,28 @@ export const addDiscount = async (discount) => {
   return response;
 };
 
-// Get all Discounts
-export const getAllDiscounts = async () => {
-  const command = new ScanCommand({
-    ProjectionExpression: '#Name, Code, Message, Website',
-    ExpressionAttributeNames: { '#Name': 'Country' },
+// Get all Discounts by WebsiteId
+export const getDiscountsByWebsiteId = async (websiteId) => {
+  const command = new QueryCommand({
+    IndexName: 'WebsiteId-Index',
     TableName: discounts,
+    KeyConditionExpression: 'WebsiteId = :websiteId',
+    ExpressionAttributeValues: {
+      ':websiteId': websiteId,
+    },
+    ConsistentRead: false,
   });
 
   const response = await docClient.send(command);
   return response.Items;
 };
 
-// Get Discount by Country
-export const getDiscountByCountry = async (country) => {
+// Get Discount by DiscountId
+export const getDiscountByDiscountId = async (discountId) => {
   const command = new GetCommand({
     TableName: discounts,
     Key: {
-      Country: country,
+      DiscountId: discountId,
     },
   });
 
@@ -51,35 +56,67 @@ export const getDiscountByCountry = async (country) => {
   return response.Item;
 };
 
-// Get Discounts by Website
-export const getDiscountsByWebsite = async (website) => {
+// Get Discount by Country
+export const getDiscountByCountry = async (country) => {
   const command = new QueryCommand({
-    IndexName: 'WebsiteIndex',
+    IndexName: 'Country-Index',
     TableName: discounts,
-    KeyConditionExpression: 'Website = :website',
+    KeyConditionExpression: 'Country = :country',
     ExpressionAttributeValues: {
-      ':website': website,
+      ':country': country,
     },
     ConsistentRead: false,
   });
+
   const response = await docClient.send(command);
   return response.Items;
 };
 
-// Delete Discount
-export const deleteDiscount = async (country) => {
-  const discount = await getDiscountByCountry(country);
+// Get Discount by WebsiteId and Country
+export const getDiscountByWebsiteIdByCountry = async (websiteId, country) => {
+  const command = new QueryCommand({
+    IndexName: 'Country-Index',
+    TableName: discounts,
+    KeyConditionExpression: 'WebsiteId = :websiteId and Country = :country',
+    ExpressionAttributeValues: {
+      ':websiteId': websiteId,
+      ':country': country,
+    },
+    ConsistentRead: false,
+  });
+
+  const response = await docClient.send(command);
+  return response.Items;
+};
+
+// Delete Discount by DiscountId
+export const deleteDiscountByDiscountId = async (discountId) => {
+  const discount = await getDiscountByDiscountId(discountId);
   if (discount === undefined) {
     return false;
   } else {
     const command = new DeleteCommand({
       TableName: discounts,
       Key: {
-        Country: country,
+        DiscountId: discountId,
       },
     });
 
     await docClient.send(command);
+    return true;
+  }
+};
+
+// Delete all Discounts by WebsiteId
+export const deleteDiscountsByWebsiteId = async (websiteId) => {
+  const discounts = await getDiscountsByWebsiteId(websiteId);
+  if (discounts.length === 0) {
+    return false;
+  } else {
+    for (let i = 0; i < discounts.length; i++) {
+      const discountId = discounts[i].DiscountId;
+      await deleteDiscountByDiscountId(discountId);
+    }
     return true;
   }
 };

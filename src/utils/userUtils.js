@@ -1,7 +1,7 @@
 import pkg from 'jsonwebtoken';
 
-import { getUserByEmail, getUserByUserId } from '../services/users.js';
 import { accessTokenSecret } from './accessTokenSecret.js';
+import { getUserByUserId, getUserByEmail } from '../services/users.js';
 
 const { verify } = pkg;
 
@@ -10,20 +10,20 @@ export const isValidEmail = (email) => {
   return email && typeof email === 'string' && email.length > 2;
 };
 
-// Does Exist User Email
-export const doesExistEmail = async (email) => {
-  const user = await getUserByEmail(email);
-  if (user[0] === undefined) {
+// Does Exist UserId
+export const doesExistUserId = async (userId) => {
+  const user = await getUserByUserId(userId);
+  if (user === undefined) {
     return true;
   } else {
     return false;
   }
 };
 
-// Does Exist UserId
-export const doesExistUserId = async (userId) => {
-  const user = await getUserByUserId(userId);
-  if (user === undefined) {
+// Does Exist User Email
+export const doesExistEmail = async (email) => {
+  const user = await getUserByEmail(email);
+  if (user[0] === undefined) {
     return true;
   } else {
     return false;
