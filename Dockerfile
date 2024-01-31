@@ -26,4 +26,4 @@ RUN npm install --dev
 EXPOSE 5000
 
 # Run the application.
-CMD npm start:prod
+CMD npm run start:prod
