@@ -57,7 +57,7 @@ auth_users.get('/auth/websites/', authenticateJWT, async (req, res) => {
 
 // Get Website by WebsiteId
 auth_users.get(
-  '/auth/websites/websiteId/:websiteId',
+  '/auth/websites/:websiteId',
   authenticateJWT,
   async (req, res) => {
     const websiteId = req.params.websiteId;
@@ -111,21 +111,12 @@ auth_users.delete('/auth/websites', authenticateJWT, async (req, res) => {
   }
 });
 
-// // Choose Website
-// auth_users.get('/website/:website', async (req, res) => {
-//   const websiteName = req.params.website;
-//   const websiteData = await getWebsiteByWebsite(websiteName);
-//   const websiteId = websiteData[0].WebsiteId;
-//   return websiteId;
-// });
-
 // ------------------------------   Discounts   ---------------------------------
 
 // Add Discount
 auth_users.post('/auth/discounts/add', authenticateJWT, async (req, res) => {
   const userId = req.user.user.userId;
-  const websiteData = await getWebsitesByUserId(userId);
-  const websiteId = websiteData[0].WebsiteId;
+  const websiteId = req.body.websiteId;
   const discountId = uuidv4();
   const country = req.body.country;
   const code = req.body.code;
