@@ -18,8 +18,8 @@ test.before(async (t) => {
   t.context.user = {
     email: 'maks' + Math.ceil(Math.random() * 100).toString() + '@gmail.com',
     password: generateRandomPassword(),
-    company: 'Qwerty',
-    website: 'qwerty.com',
+    company: 'Qwerty' + Math.ceil(Math.random() * 100).toString(),
+    website: 'qwerty' + Math.ceil(Math.random() * 100).toString() + '.com',
   };
 
   const registerUser = await t.context.API.post(`/register`, t.context.user);
@@ -41,7 +41,7 @@ test.before(async (t) => {
   t.context.userId = getUserId.data[0].UserId;
 
   t.context.website = {
-    website: 'qwerty.com',
+    website: t.context.user.website,
   };
 
   const getWebsiteId = await t.context.API.get(
@@ -54,6 +54,7 @@ test.before(async (t) => {
     country: 'India' + +Math.ceil(Math.random() * 100).toString(),
     code: `testprefix-${Math.ceil(Math.random() * 10000).toString()}`,
     text: 'Random text',
+    websiteId: t.context.websiteId,
   };
 
   const responseAddDiscount = await t.context.API.post(
@@ -166,6 +167,7 @@ test('[e2e] Get Discount by DiscountId', async (t) => {
     country: response.data.Country,
     code: response.data.Code,
     text: response.data.Text,
+    websiteId: response.data.WebsiteId,
   };
   t.like(discount, t.context.discount);
 });
@@ -181,6 +183,7 @@ test('[e2e] Get Discount by Country', async (t) => {
     country: response.data[0].Country,
     code: response.data[0].Code,
     text: response.data[0].Text,
+    websiteId: response.data[0].WebsiteId,
   };
   t.like(discount, t.context.discount);
 });

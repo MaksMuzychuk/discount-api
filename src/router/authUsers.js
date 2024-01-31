@@ -57,7 +57,7 @@ auth_users.get('/auth/websites/', authenticateJWT, async (req, res) => {
 
 // Get Website by WebsiteId
 auth_users.get(
-  '/auth/websites/:websiteId',
+  '/auth/websites/websiteId/:websiteId',
   authenticateJWT,
   async (req, res) => {
     const websiteId = req.params.websiteId;
