@@ -8,7 +8,8 @@
     "test": "ava",
     "test:unit": "ava ./src",
     "test:e2e": "ava ./tests/testE2E.js",
-    "start": "nodemon --watch src src/index.js"
+    "start": "nodemon --watch src src/index.js",
+    "start:prod": "pm2 start src/index.js"
   },
   "author": "",
   "license": "ISC",

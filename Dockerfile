@@ -16,6 +16,7 @@ WORKDIR /usr/src/app
 # Copy the rest of the source files into the image.
 COPY . .
 
+RUN npm install pm2 -g
 RUN npm install --dev
 
 # Run the application as a non-root user.
@@ -25,4 +26,4 @@ RUN npm install --dev
 EXPOSE 5000
 
 # Run the application.
-CMD npm start
+CMD npm start:prod
