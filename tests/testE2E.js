@@ -25,8 +25,8 @@ test.before(async (t) => {
   const registerUser = await t.context.API.post(`/register`, t.context.user);
   t.is(registerUser.status, 200);
 
-  const loginUser = await t.context.API.post('/login', t.context.user);
-  t.is(loginUser.status, 200);
+  // const loginUser = await t.context.API.post('/login', t.context.user);
+  // t.is(loginUser.status, 200);
 
   // t.context.accessToken = {
   //   headers: {
@@ -42,6 +42,7 @@ test.before(async (t) => {
 
   t.context.website = {
     website: t.context.user.website,
+    userId: t.context.userId,
   };
 
   const getWebsiteId = await t.context.API.get(
@@ -55,6 +56,7 @@ test.before(async (t) => {
     code: `testprefix-${Math.ceil(Math.random() * 10000).toString()}`,
     text: 'Random text',
     websiteId: t.context.websiteId,
+    userId: t.context.userId,
   };
 
   const responseAddDiscount = await t.context.API.post(
@@ -112,7 +114,7 @@ test('[e2e] Get User by Email', async (t) => {
 
 test('[e2e] Get all Websites by UserId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/websites`
+    `/auth/websites/${t.context.userId}`
     // t.context.accessToken
   );
   t.is(response.status, 200);
@@ -128,6 +130,7 @@ test('[e2e] Get Website by WebsiteId', async (t) => {
 
   const website = {
     website: response.data.Website,
+    userId: response.data.UserId,
   };
   t.like(website, t.context.website);
 });
@@ -141,6 +144,7 @@ test('[e2e] Get Website by Website', async (t) => {
 
   const website = {
     website: response.data[0].Website,
+    userId: response.data[0].UserId,
   };
   t.like(website, t.context.website);
 });
@@ -168,6 +172,7 @@ test('[e2e] Get Discount by DiscountId', async (t) => {
     code: response.data.Code,
     text: response.data.Text,
     websiteId: response.data.WebsiteId,
+    userId: response.data.UserId,
   };
   t.like(discount, t.context.discount);
 });
@@ -184,6 +189,7 @@ test('[e2e] Get Discount by Country', async (t) => {
     code: response.data[0].Code,
     text: response.data[0].Text,
     websiteId: response.data[0].WebsiteId,
+    userId: response.data[0].UserId,
   };
   t.like(discount, t.context.discount);
 });

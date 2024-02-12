@@ -43,30 +43,30 @@ public_users.post('/register', async (req, res) => {
 });
 
 // Login User
-public_users.post('/login', async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const user = await getUserByEmail(email);
+// public_users.post('/login', async (req, res) => {
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   const user = await getUserByEmail(email);
 
-  if (!email || !password) {
-    return res.status(404).json({ message: 'Error loging in.' });
-  }
+//   if (!email || !password) {
+//     return res.status(404).json({ message: 'Error loging in.' });
+//   }
 
-  if (await authenticatedUser(email, password)) {
-    let accessToken = sign(
-      {
-        user: {
-          userId: user[0].UserId,
-          email: email,
-        },
-      },
-      accessTokenSecret,
-      { expiresIn: 3600 }
-    );
-    return res.status(200).send({ accessToken });
-  } else {
-    return res.status(208).json({ message: 'Invalid Login.' });
-  }
-});
+//   if (await authenticatedUser(email, password)) {
+//     let accessToken = sign(
+//       {
+//         user: {
+//           userId: user[0].UserId,
+//           email: email,
+//         },
+//       },
+//       accessTokenSecret,
+//       { expiresIn: 3600 }
+//     );
+//     return res.status(200).send({ accessToken });
+//   } else {
+//     return res.status(208).json({ message: 'Invalid Login.' });
+//   }
+// });
 
 export const public_routes = public_users;

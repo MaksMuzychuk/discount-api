@@ -28,7 +28,7 @@ const auth_users = Router();
 // Add Website
 auth_users.post('/auth/websites/add', async (req, res) => {
   const websiteId = uuidv4();
-  const userId = req.user.user.userId;
+  const userId = req.body.userId;
   const website = req.body.website;
   const existWebsite = await doesExistWebsite(userId, website);
 
@@ -45,8 +45,8 @@ auth_users.post('/auth/websites/add', async (req, res) => {
 });
 
 // Get all Websites by UserId
-auth_users.get('/auth/websites/', async (req, res) => {
-  const userId = req.user.user.userId;
+auth_users.get('/auth/websites/:userId', async (req, res) => {
+  const userId = req.params.userId;
   const result = await getWebsitesByUserId(userId);
   if (!result || result.length == 0) {
     res.status(404).json({ error: 'Not found' });
@@ -89,8 +89,8 @@ auth_users.delete('/auth/websites/websiteId/:websiteId', async (req, res) => {
 });
 
 // Delete all Websites by UserId
-auth_users.delete('/auth/websites', async (req, res) => {
-  const userId = req.user.user.userId;
+auth_users.delete('/auth/websites/:userId', async (req, res) => {
+  const userId = req.params.userId;
   const result = await deleteWebsitesByUserId(userId);
   if (result) {
     return res.status(200).json({ message: `Websites successfully removed.` });
@@ -103,7 +103,7 @@ auth_users.delete('/auth/websites', async (req, res) => {
 
 // Add Discount
 auth_users.post('/auth/discounts/add', async (req, res) => {
-  const userId = req.user.user.userId;
+  const userId = req.body.userId;
   const websiteId = req.body.websiteId;
   const discountId = uuidv4();
   const country = req.body.country;
