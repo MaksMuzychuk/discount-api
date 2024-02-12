@@ -28,15 +28,15 @@ test.before(async (t) => {
   const loginUser = await t.context.API.post('/login', t.context.user);
   t.is(loginUser.status, 200);
 
-  t.context.accessToken = {
-    headers: {
-      authorization: `Bearer ${loginUser.data.accessToken}`,
-    },
-  };
+  // t.context.accessToken = {
+  //   headers: {
+  //     authorization: `Bearer ${loginUser.data.accessToken}`,
+  //   },
+  // };
 
   const getUserId = await t.context.API.get(
-    `/admin/user/email/${t.context.user.email}`,
-    t.context.accessToken
+    `/admin/user/email/${t.context.user.email}`
+    // t.context.accessToken
   );
   t.context.userId = getUserId.data[0].UserId;
 
@@ -45,8 +45,8 @@ test.before(async (t) => {
   };
 
   const getWebsiteId = await t.context.API.get(
-    `/auth/websites/website/${t.context.user.website}`,
-    t.context.accessToken
+    `/auth/websites/website/${t.context.user.website}`
+    // t.context.accessToken
   );
   t.context.websiteId = getWebsiteId.data[0].WebsiteId;
 
@@ -59,14 +59,14 @@ test.before(async (t) => {
 
   const responseAddDiscount = await t.context.API.post(
     '/auth/discounts/add',
-    t.context.discount,
-    t.context.accessToken
+    t.context.discount
+    // t.context.accessToken
   );
   t.is(responseAddDiscount.status, 200);
 
   const getDiscountId = await t.context.API.get(
-    `/auth/discounts/country/${t.context.discount.country}`,
-    t.context.accessToken
+    `/auth/discounts/country/${t.context.discount.country}`
+    // t.context.accessToken
   );
   t.context.discountId = getDiscountId.data[0].DiscountId;
 });
@@ -75,8 +75,8 @@ test.before(async (t) => {
 
 test('[e2e] Get all Users', async (t) => {
   const response = await t.context.API.get(
-    `/admin/users`,
-    t.context.accessToken
+    `/admin/users`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
@@ -84,8 +84,8 @@ test('[e2e] Get all Users', async (t) => {
 
 test('[e2e] Get User by UserId', async (t) => {
   const response = await t.context.API.get(
-    `/admin/user/${t.context.userId}`,
-    t.context.accessToken
+    `/admin/user/${t.context.userId}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
 
@@ -101,8 +101,8 @@ test('[e2e] Get User by UserId', async (t) => {
 
 test('[e2e] Get User by Email', async (t) => {
   const response = await t.context.API.get(
-    `/admin/user/email/${t.context.user.email}`,
-    t.context.accessToken
+    `/admin/user/email/${t.context.user.email}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
@@ -112,8 +112,8 @@ test('[e2e] Get User by Email', async (t) => {
 
 test('[e2e] Get all Websites by UserId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/websites`,
-    t.context.accessToken
+    `/auth/websites`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
@@ -121,8 +121,8 @@ test('[e2e] Get all Websites by UserId', async (t) => {
 
 test('[e2e] Get Website by WebsiteId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/websites/websiteId/${t.context.websiteId}`,
-    t.context.accessToken
+    `/auth/websites/websiteId/${t.context.websiteId}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
 
@@ -134,8 +134,8 @@ test('[e2e] Get Website by WebsiteId', async (t) => {
 
 test('[e2e] Get Website by Website', async (t) => {
   const response = await t.context.API.get(
-    `/auth/websites/website/${t.context.website.website}`,
-    t.context.accessToken
+    `/auth/websites/website/${t.context.website.website}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
 
@@ -149,8 +149,8 @@ test('[e2e] Get Website by Website', async (t) => {
 
 test('[e2e] Get all Discounts by WebsiteId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/discounts/websiteId/${t.context.websiteId}`,
-    t.context.accessToken
+    `/auth/discounts/websiteId/${t.context.websiteId}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
   t.truthy(response.data.length > 0);
@@ -158,8 +158,8 @@ test('[e2e] Get all Discounts by WebsiteId', async (t) => {
 
 test('[e2e] Get Discount by DiscountId', async (t) => {
   const response = await t.context.API.get(
-    `/auth/discounts/discountId/${t.context.discountId}`,
-    t.context.accessToken
+    `/auth/discounts/discountId/${t.context.discountId}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
 
@@ -174,8 +174,8 @@ test('[e2e] Get Discount by DiscountId', async (t) => {
 
 test('[e2e] Get Discount by Country', async (t) => {
   const response = await t.context.API.get(
-    `/auth/discounts/country/${t.context.discount.country}`,
-    t.context.accessToken
+    `/auth/discounts/country/${t.context.discount.country}`
+    // t.context.accessToken
   );
   t.is(response.status, 200);
 
@@ -192,20 +192,20 @@ test('[e2e] Get Discount by Country', async (t) => {
 
 test.after.always(async (t) => {
   const deleteDiscount = await t.context.API.delete(
-    `/auth/discounts/discountId/${t.context.discountId}`,
-    t.context.accessToken
+    `/auth/discounts/discountId/${t.context.discountId}`
+    // t.context.accessToken
   );
   t.is(deleteDiscount.status, 200);
 
   const deleteWebsite = await t.context.API.delete(
-    `/auth/websites/websiteId/${t.context.websiteId}`,
-    t.context.accessToken
+    `/auth/websites/websiteId/${t.context.websiteId}`
+    // t.context.accessToken
   );
   t.is(deleteWebsite.status, 200);
 
   const deleteUser = await t.context.API.delete(
-    `/admin/user/${t.context.userId}`,
-    t.context.accessToken
+    `/admin/user/${t.context.userId}`
+    // t.context.accessToken
   );
   t.is(deleteUser.status, 200);
 });
