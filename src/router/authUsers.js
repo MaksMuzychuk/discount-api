@@ -26,7 +26,7 @@ const auth_users = Router();
 // ------------------------------   Websites   ---------------------------------
 
 // Add Website
-auth_users.post('/auth/websites/add', authenticateJWT, async (req, res) => {
+auth_users.post('/auth/websites/add', async (req, res) => {
   const websiteId = uuidv4();
   const userId = req.user.user.userId;
   const website = req.body.website;
@@ -45,7 +45,7 @@ auth_users.post('/auth/websites/add', authenticateJWT, async (req, res) => {
 });
 
 // Get all Websites by UserId
-auth_users.get('/auth/websites/', authenticateJWT, async (req, res) => {
+auth_users.get('/auth/websites/', async (req, res) => {
   const userId = req.user.user.userId;
   const result = await getWebsitesByUserId(userId);
   if (!result || result.length == 0) {
@@ -56,52 +56,40 @@ auth_users.get('/auth/websites/', authenticateJWT, async (req, res) => {
 });
 
 // Get Website by WebsiteId
-auth_users.get(
-  '/auth/websites/websiteId/:websiteId',
-  authenticateJWT,
-  async (req, res) => {
-    const websiteId = req.params.websiteId;
-    const result = await getWebsiteByWebsiteId(websiteId);
-    if (!result) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
+auth_users.get('/auth/websites/websiteId/:websiteId', async (req, res) => {
+  const websiteId = req.params.websiteId;
+  const result = await getWebsiteByWebsiteId(websiteId);
+  if (!result) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
   }
-);
+});
 
 // Get Website by Website
-auth_users.get(
-  '/auth/websites/website/:website',
-  authenticateJWT,
-  async (req, res) => {
-    const website = req.params.website;
-    const result = await getWebsiteByWebsite(website);
-    if (!result || result.length == 0) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
+auth_users.get('/auth/websites/website/:website', async (req, res) => {
+  const website = req.params.website;
+  const result = await getWebsiteByWebsite(website);
+  if (!result || result.length == 0) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
   }
-);
+});
 
 // Delete Website by WebsiteId
-auth_users.delete(
-  '/auth/websites/websiteId/:websiteId',
-  authenticateJWT,
-  async (req, res) => {
-    const websiteId = req.params.websiteId;
-    const result = await deleteWebsiteByWebsiteId(websiteId);
-    if (result) {
-      return res.status(200).json({ message: `Website successfully removed.` });
-    } else {
-      return res.status(400).json({ message: 'Unable to remove a website.' });
-    }
+auth_users.delete('/auth/websites/websiteId/:websiteId', async (req, res) => {
+  const websiteId = req.params.websiteId;
+  const result = await deleteWebsiteByWebsiteId(websiteId);
+  if (result) {
+    return res.status(200).json({ message: `Website successfully removed.` });
+  } else {
+    return res.status(400).json({ message: 'Unable to remove a website.' });
   }
-);
+});
 
 // Delete all Websites by UserId
-auth_users.delete('/auth/websites', authenticateJWT, async (req, res) => {
+auth_users.delete('/auth/websites', async (req, res) => {
   const userId = req.user.user.userId;
   const result = await deleteWebsitesByUserId(userId);
   if (result) {
@@ -114,7 +102,7 @@ auth_users.delete('/auth/websites', authenticateJWT, async (req, res) => {
 // ------------------------------   Discounts   ---------------------------------
 
 // Add Discount
-auth_users.post('/auth/discounts/add', authenticateJWT, async (req, res) => {
+auth_users.post('/auth/discounts/add', async (req, res) => {
   const userId = req.user.user.userId;
   const websiteId = req.body.websiteId;
   const discountId = uuidv4();
@@ -145,54 +133,41 @@ auth_users.post('/auth/discounts/add', authenticateJWT, async (req, res) => {
 });
 
 // Get all Discounts by WebsiteId
-auth_users.get(
-  '/auth/discounts/websiteId/:websiteId',
-  authenticateJWT,
-  async (req, res) => {
-    const websiteId = req.params.websiteId;
-    const result = await getDiscountsByWebsiteId(websiteId);
-    if (!result || result.length == 0) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
+auth_users.get('/auth/discounts/websiteId/:websiteId', async (req, res) => {
+  const websiteId = req.params.websiteId;
+  const result = await getDiscountsByWebsiteId(websiteId);
+  if (!result || result.length == 0) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
   }
-);
+});
 
 // Get Discount by DiscountId
-auth_users.get(
-  '/auth/discounts/discountId/:discountId',
-  authenticateJWT,
-  async (req, res) => {
-    const discountId = req.params.discountId;
-    const result = await getDiscountByDiscountId(discountId);
-    if (!result) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
+auth_users.get('/auth/discounts/discountId/:discountId', async (req, res) => {
+  const discountId = req.params.discountId;
+  const result = await getDiscountByDiscountId(discountId);
+  if (!result) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
   }
-);
+});
 
 // Get Discount by Country
-auth_users.get(
-  '/auth/discounts/country/:country',
-  authenticateJWT,
-  async (req, res) => {
-    const country = req.params.country;
-    const result = await getDiscountByCountry(country);
-    if (!result || result.length == 0) {
-      res.status(404).json({ error: 'Not found' });
-    } else {
-      res.status(200).json(result);
-    }
+auth_users.get('/auth/discounts/country/:country', async (req, res) => {
+  const country = req.params.country;
+  const result = await getDiscountByCountry(country);
+  if (!result || result.length == 0) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
   }
-);
+});
 
 // Delete Discount by DiscountId
 auth_users.delete(
   '/auth/discounts/discountId/:discountId',
-  authenticateJWT,
   async (req, res) => {
     const discountId = req.params.discountId;
     const result = await deleteDiscountByDiscountId(discountId);
@@ -207,20 +182,14 @@ auth_users.delete(
 );
 
 // Delete all Discounts by WebsiteId
-auth_users.delete(
-  '/auth/discounts/websiteId/:websiteId',
-  authenticateJWT,
-  async (req, res) => {
-    const websiteId = req.params.websiteId;
-    const result = await deleteDiscountsByWebsiteId(websiteId);
-    if (result) {
-      return res
-        .status(200)
-        .json({ message: `Discounts successfully removed.` });
-    } else {
-      return res.status(400).json({ message: 'Unable to remove discounts.' });
-    }
+auth_users.delete('/auth/discounts/websiteId/:websiteId', async (req, res) => {
+  const websiteId = req.params.websiteId;
+  const result = await deleteDiscountsByWebsiteId(websiteId);
+  if (result) {
+    return res.status(200).json({ message: `Discounts successfully removed.` });
+  } else {
+    return res.status(400).json({ message: 'Unable to remove discounts.' });
   }
-);
+});
 
 export const auth_routes = auth_users;
