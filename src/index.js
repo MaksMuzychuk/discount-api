@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
 import { auth_routes } from './router/authUsers.js';
@@ -7,7 +8,7 @@ import { admin_routes } from './router/adminUsers.js';
 
 const app = express();
 
-app.use(express.json());
+app.use(cors());
 app.use(
   session({
     secret: '23h4kjsgdfjhdhd',

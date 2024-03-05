@@ -104,8 +104,7 @@ auth_users.delete('/auth/websites/:userId', async (req, res) => {
 // Add Discount
 auth_users.post('/auth/discounts/add', async (req, res) => {
   const userId = req.body.userId;
-  const website = req.body.website;
-  const websiteId = await getWebsiteByWebsite(website).WebsiteId;
+  const websiteId = req.body.websiteId;
   const discountId = uuidv4();
   const country = req.body.country;
   const code = req.body.code;
