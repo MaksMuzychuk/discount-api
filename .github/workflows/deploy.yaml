@@ -94,7 +94,7 @@ jobs:
           envs: REGISTRY,IMAGE_REPOSITORY,IMAGE_TAG,AWS_DEFAULT_REGION
           key: ${{ env.PRIVATE_SSH_KEY }}
           script: |-
-            sudo apt update
+            sudo apt update 2>/dev/null
             sudo apt install docker.io -y
             sudo apt install awscli -y
             sudo $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION);
