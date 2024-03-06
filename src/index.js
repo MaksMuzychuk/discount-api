@@ -8,6 +8,7 @@ import { admin_routes } from './router/adminUsers.js';
 
 const app = express();
 
+app.use(express.json());
 app.use(cors());
 app.use(
   session({
