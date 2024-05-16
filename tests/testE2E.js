@@ -5,8 +5,8 @@ import { generateRandomPassword } from './utils/generatePassword.js';
 
 dotenv.config();
 
-// const API_BASE_URL = `http://${process.env.SERVER_IP}:5000/`;
-const API_BASE_URL = `http://localhost:5000/`;
+const API_BASE_URL = `http://${process.env.SERVER_IP}:5000/`;
+// const API_BASE_URL = `http://localhost:5000/`;
 
 // -------------------------------   Tests Before   ----------------------------------
 
