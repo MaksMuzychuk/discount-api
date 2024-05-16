@@ -11,6 +11,7 @@ import {
   getDiscountByCountry,
   deleteDiscountByDiscountId,
   deleteDiscountsByWebsiteId,
+  getDiscountByProduct,
 } from '../services/discounts.js';
 import {
   addWebsite,
@@ -106,16 +107,18 @@ auth_users.post('/auth/discounts/add', async (req, res) => {
   const userId = req.body.userId;
   const websiteId = req.body.websiteId;
   const discountId = uuidv4();
+  const product = req.body.product;
   const country = req.body.country;
   const code = req.body.code;
   const text = req.body.text;
-  const existDiscount = await doesExistDiscount(websiteId, country);
+  const existDiscount = await doesExistDiscount(websiteId, country, product);
 
   if (existDiscount) {
     const result = await addDiscount({
       websiteId,
       userId,
       discountId,
+      product,
       country,
       code,
       text,
@@ -158,6 +161,17 @@ auth_users.get('/auth/discounts/discountId/:discountId', async (req, res) => {
 auth_users.get('/auth/discounts/country/:country', async (req, res) => {
   const country = req.params.country;
   const result = await getDiscountByCountry(country);
+  if (!result || result.length == 0) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(200).json(result);
+  }
+});
+
+// Get Discount by Product
+auth_users.get('/auth/discounts/product/:product', async (req, res) => {
+  const product = req.params.product;
+  const result = await getDiscountByProduct(product);
   if (!result || result.length == 0) {
     res.status(404).json({ error: 'Not found' });
   } else {

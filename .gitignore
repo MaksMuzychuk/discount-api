@@ -5,3 +5,4 @@ node_modules/
 .terraform/
 .terraform.lock.hcl
 banner.html
+create_price.js

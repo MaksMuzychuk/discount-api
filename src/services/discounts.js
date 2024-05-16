@@ -17,6 +17,7 @@ export const addDiscount = async (discount) => {
       DiscountId: discount.discountId,
       WebsiteId: discount.websiteId,
       UserId: discount.userId,
+      Product: discount.product,
       Country: discount.country,
       Code: discount.code,
       Text: discount.text,
@@ -64,6 +65,22 @@ export const getDiscountByCountry = async (country) => {
     KeyConditionExpression: 'Country = :country',
     ExpressionAttributeValues: {
       ':country': country,
+    },
+    ConsistentRead: false,
+  });
+
+  const response = await docClient.send(command);
+  return response.Items;
+};
+
+// Get Discount by Product
+export const getDiscountByProduct = async (product) => {
+  const command = new QueryCommand({
+    IndexName: 'Product-Index',
+    TableName: discounts,
+    KeyConditionExpression: 'Product = :product',
+    ExpressionAttributeValues: {
+      ':product': product,
     },
     ConsistentRead: false,
   });

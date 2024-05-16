@@ -77,11 +77,16 @@ resource "aws_dynamodb_table" "table-discounts" {
     type = "S"
   }
 
+  attribute {
+    name = "Product"
+    type = "S"
+  }
+
   global_secondary_index {
     name               = "WebsiteId-Index"
     hash_key           = "WebsiteId"
     projection_type    = "INCLUDE"
-    non_key_attributes = ["UserId", "DiscountId", "Country", "Code", "Text"]
+    non_key_attributes = ["UserId", "DiscountId", "Product","Country", "Code", "Text"]
   }
 
   global_secondary_index {
@@ -89,7 +94,14 @@ resource "aws_dynamodb_table" "table-discounts" {
     hash_key           = "Country"
     range_key          = "WebsiteId"
     projection_type    = "INCLUDE"
-    non_key_attributes = ["UserId", "DiscountId", "WebsiteId", "Code", "Text"]
+    non_key_attributes = ["UserId", "DiscountId", "WebsiteId", "Product", "Code", "Text"]
+  }
+
+  global_secondary_index {
+    name               = "Product-Index"
+    hash_key           = "Product"
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["UserId", "DiscountId", "WebsiteId","Country", "Code", "Text"]
   }
 }
 

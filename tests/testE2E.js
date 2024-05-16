@@ -5,7 +5,8 @@ import { generateRandomPassword } from './utils/generatePassword.js';
 
 dotenv.config();
 
-const API_BASE_URL = `http://${process.env.SERVER_IP}:5000/`;
+// const API_BASE_URL = `http://${process.env.SERVER_IP}:5000/`;
+const API_BASE_URL = `http://localhost:5000/`;
 
 // -------------------------------   Tests Before   ----------------------------------
 
@@ -55,6 +56,7 @@ test.before(async (t) => {
     country: 'India' + +Math.ceil(Math.random() * 100).toString(),
     code: `testprefix-${Math.ceil(Math.random() * 10000).toString()}`,
     text: 'Random text',
+    product: 'Random product',
     websiteId: t.context.websiteId,
     userId: t.context.userId,
   };
@@ -171,6 +173,7 @@ test('[e2e] Get Discount by DiscountId', async (t) => {
     country: response.data.Country,
     code: response.data.Code,
     text: response.data.Text,
+    product: response.data.Product,
     websiteId: response.data.WebsiteId,
     userId: response.data.UserId,
   };
@@ -188,6 +191,25 @@ test('[e2e] Get Discount by Country', async (t) => {
     country: response.data[0].Country,
     code: response.data[0].Code,
     text: response.data[0].Text,
+    product: response.data[0].Product,
+    websiteId: response.data[0].WebsiteId,
+    userId: response.data[0].UserId,
+  };
+  t.like(discount, t.context.discount);
+});
+
+test('[e2e] Get Discount by Product', async (t) => {
+  const response = await t.context.API.get(
+    `/auth/discounts/product/${t.context.discount.product}`
+    // t.context.accessToken
+  );
+  t.is(response.status, 200);
+
+  const discount = {
+    country: response.data[0].Country,
+    code: response.data[0].Code,
+    text: response.data[0].Text,
+    product: response.data[0].Product,
     websiteId: response.data[0].WebsiteId,
     userId: response.data[0].UserId,
   };
