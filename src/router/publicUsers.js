@@ -26,12 +26,23 @@ public_users.post('/register', async (req, res) => {
   const company = req.body.company;
   const websiteId = uuidv4();
   const website = req.body.website;
+  const plan = 'Standart';
+  const discountCount = 0;
 
   if (isValidEmail(email) && password) {
     const existEmail = await doesExistEmail(email);
     const existUserId = await doesExistUserId(userId);
     if (existEmail && existUserId) {
-      addUser(userId, email, password, company, websiteId, website);
+      addUser(
+        userId,
+        email,
+        password,
+        company,
+        websiteId,
+        website,
+        plan,
+        discountCount
+      );
       return res
         .status(200)
         .json({ message: `${email} successfully registred.` });

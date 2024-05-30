@@ -21,6 +21,7 @@ import {
   deleteWebsiteByWebsiteId,
   deleteWebsitesByUserId,
 } from '../services/websites.js';
+import { getUserByUserId, updateDiscountCount } from '../services/users.js';
 
 const auth_users = Router();
 
@@ -150,11 +151,21 @@ auth_users.get('/auth/discounts/websiteId/:websiteId', async (req, res) => {
 auth_users.get('/auth/discounts/discountId/:discountId', async (req, res) => {
   const discountId = req.params.discountId;
   const result = await getDiscountByDiscountId(discountId);
-  if (!result) {
-    res.status(404).json({ error: 'Not found' });
-  } else {
-    res.status(200).json(result);
+  const userId = result.UserId;
+  const user = await getUserByUserId(userId);
+  const discountCount = user.DiscountCount;
+  const userPlan = user.Plan;
+  if (
+    (discountCount >= 100000 && userPlan == 'Pro') ||
+    (discountCount >= 100 && userPlan == 'Standart')
+  ) {
+    return res.status(403).json({ error: 'Requests Limit' });
   }
+  if (!result) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  await updateDiscountCount(userId);
+  return res.status(200).json(result);
 });
 
 // Get Discount by Country

@@ -6,6 +6,7 @@ import {
   getUserByUserId,
   getUserByEmail,
   deleteUser,
+  updateDiscountCount,
 } from '../services/users.js';
 
 const admin_users = Router();
@@ -44,6 +45,17 @@ admin_users.delete('/admin/user/:userId', async (req, res) => {
   const result = await deleteUser(userId);
   if (result) {
     res.status(200).json({ result: 'User has been removed.' });
+  } else {
+    res.status(404).json({ error: 'User does not exist.' });
+  }
+});
+
+// Update Discount Count
+admin_users.put('/admin/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const result = await updateDiscountCount(userId);
+  if (result) {
+    res.status(200).json({ result: 'User has been updated.' });
   } else {
     res.status(404).json({ error: 'User does not exist.' });
   }

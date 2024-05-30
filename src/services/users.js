@@ -1,5 +1,6 @@
 import {
   QueryCommand,
+  UpdateCommand,
   PutCommand,
   ScanCommand,
   GetCommand,
@@ -19,7 +20,9 @@ export const addUser = async (
   password,
   company,
   websiteId,
-  website
+  website,
+  plan,
+  discountCount
 ) => {
   const passwordHash = MD5(password);
 
@@ -30,6 +33,8 @@ export const addUser = async (
       Email: email,
       Password: passwordHash,
       Company: company,
+      Plan: plan,
+      DiscountCount: discountCount,
     },
   });
 
@@ -110,6 +115,30 @@ export const deleteUser = async (userId) => {
 
     const response = await docClient.send(command);
     await deleteWebsitesByUserId(userId);
+    return true;
+  }
+};
+
+// Update Discount Count
+export const updateDiscountCount = async (userId) => {
+  const user = await getUserByUserId(userId);
+  if (user === undefined) {
+    return false;
+  } else {
+    const command = new UpdateCommand({
+      TableName: users,
+      Key: {
+        UserId: userId,
+      },
+      UpdateExpression:
+        'set DiscountCount = if_not_exists(DiscountCount, :start) + :inc',
+      ExpressionAttributeValues: {
+        ':start': 0,
+        ':inc': 1,
+      },
+    });
+
+    await docClient.send(command);
     return true;
   }
 };
