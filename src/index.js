@@ -5,10 +5,16 @@ import session from 'express-session';
 import { auth_routes } from './router/authUsers.js';
 import { public_routes } from './router/publicUsers.js';
 import { admin_routes } from './router/adminUsers.js';
+import { webhook_router } from './router/webhook.js';
 
 const app = express();
 
-app.use(express.json());
+var rawBodySaver = function (req, res, buf, encoding) {
+  if (buf && buf.length) {
+    req.rawBody = buf.toString(encoding || 'utf8');
+  }
+};
+app.use(express.json({ verify: rawBodySaver }));
 app.use(cors());
 app.use(
   session({
@@ -49,5 +55,6 @@ const PORT = 5000;
 app.use('/', auth_routes);
 app.use('/', public_routes);
 app.use('/', admin_routes);
+app.use('/', webhook_router);
 
 app.listen(PORT, () => console.log('Server is running'));
