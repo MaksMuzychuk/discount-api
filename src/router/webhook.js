@@ -2,20 +2,20 @@ import Stripe from 'stripe';
 import express from 'express';
 import dotenv from 'dotenv';
 
+import { createCustomerSubscription } from '../services/users.js';
+import { getSecret } from '../utils/secrets.js';
+
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SK);
-
 const webhook_router = express.Router();
-
-const endpointSecret = process.env.STRIPE_WEBHOOK;
 
 webhook_router.post(
   '/webhook',
   express.raw({ type: 'application/json' }),
-  (request, response) => {
+  async (request, response) => {
     const sig = request.headers['stripe-signature'];
-
+    const stripe = new Stripe(await getSecret('STRIPE_SK'));
+    const endpointSecret = await getSecret('STRIPE_WEBHOOK');
     let event;
 
     try {
@@ -32,9 +32,13 @@ webhook_router.post(
 
     // Handle the event
     switch (event.type) {
-      case 'subscription_schedule.canceled':
-        const subscriptionScheduleCanceled = event.data.object;
-        // Then define and call a function to handle the event subscription_schedule.canceled
+      case 'customer.subscription.created':
+        const customerSubscriptionCreated = event.data.object;
+        createCustomerSubscription(customerSubscriptionCreated);
+        break;
+      case 'customer.subscription.deleted':
+        const customerSubscriptionDeleted = event.data.object;
+        // Then define and call a function to handle the event customer.subscription.deleted
         break;
       // ... handle other event types
       default:
